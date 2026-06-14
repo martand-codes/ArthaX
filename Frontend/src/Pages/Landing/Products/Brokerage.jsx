@@ -3,7 +3,7 @@ import React from 'react'
 const Brokerage = () => {
   return (
     <div>
-      Hii I am Brokerage of Pricing
+      Hii I am Brockrage
     </div>
   )
 }

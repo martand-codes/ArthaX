@@ -2,7 +2,7 @@ import React from 'react'
 import Hero from './Hero'
 import Brokerage from './Brokerage'
 
-const PricingPage = () => {
+const ProductPage = () => {
   return (
     <div>
       <Hero />
@@ -11,4 +11,4 @@ const PricingPage = () => {
   )
 }
 
-export default PricingPage
+export default ProductPage
