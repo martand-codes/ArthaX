@@ -1,12 +1,13 @@
 import React from 'react'
 import Hero from './Hero'
-import Brokerage from './Brokerage'
+
+import ProductBento from './ProductBento'
 
 const ProductPage = () => {
   return (
     <div>
       <Hero />
-      <Brokerage />
+      <ProductBento />
     </div>
   )
 }
