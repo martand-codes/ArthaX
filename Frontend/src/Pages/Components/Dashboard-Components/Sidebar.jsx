@@ -1,9 +1,10 @@
 import React from 'react'
+import Menu from './Menu.jsx'
 
 const Sidebar = () => {
   return (
     <div>
-      Hii I am side BAR
+      <Menu/>
     </div>
   )
 }

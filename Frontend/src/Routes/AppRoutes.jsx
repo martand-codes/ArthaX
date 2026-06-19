@@ -12,6 +12,11 @@ import Signup from "../Pages/Landing/Signup/Signup.jsx";
 import ErrorPage from "../Pages/Landing/ErrorPage.jsx";
 
 import DashboardPage from "../Pages/Dashboard/DashboardPage.jsx";
+import Orders from "../Pages/Components/Dashboard-Components/Orders.jsx";
+import Holdings from "../Pages/Components/Dashboard-Components/Holdings.jsx";
+import Positions from "../Pages/Components/Dashboard-Components/Positions.jsx";
+import Funds from "../Pages/Components/Dashboard-Components/Funds.jsx";
+import Report from "../Pages/Components/Dashboard-Components/Report.jsx";
 
 const AppRoutes = () => {
   return (
@@ -30,6 +35,12 @@ const AppRoutes = () => {
       {/* Dashboard */}
       <Route element={<DashboardLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/orders" element={<Orders />} />
+        <Route path="/dashboard/holdings" element={<Holdings />} />
+        <Route path="/dashboard/positions" element={<Positions />} />
+        <Route path="/dashboard/funds" element={<Funds />} />
+        <Route path="/dashboard/reports" element={<Report />} />
+
       </Route>
 
       <Route path="*" element={<ErrorPage />} />
