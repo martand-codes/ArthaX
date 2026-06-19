@@ -1,9 +1,9 @@
 import React from 'react'
-
+import Menu from './Menu.jsx'
 const TopBar = () => {
   return (
     <div>
-      Hii This is Top BAR
+      <Menu/>
     </div>
   )
 }

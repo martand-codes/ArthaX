@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ProtfolioSummary = () => {
+const PortfolioSummary = () => {
   return (
     <div>
       Hii This is the summary of your Dashboard!
@@ -8,4 +8,4 @@ const ProtfolioSummary = () => {
   )
 }
 
-export default ProtfolioSummary
+export default PortfolioSummary

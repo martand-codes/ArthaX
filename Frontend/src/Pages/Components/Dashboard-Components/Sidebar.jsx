@@ -1,10 +1,12 @@
 import React from 'react'
-import Menu from './Menu.jsx'
+import WatchList from './WatchList.jsx'
+
 
 const Sidebar = () => {
   return (
     <div>
-      <Menu/>
+      <WatchList />
+      
     </div>
   )
 }
