@@ -1,11 +1,27 @@
-import React, { useState } from 'react'
-import { Search, MoreVertical, TrendingUp, TrendingDown, SlidersHorizontal, Trash2 } from 'lucide-react'
+import React, { useState } from 'react';
+import { Search, SlidersHorizontal, Trash2 } from 'lucide-react';
+import TradeModal from './TradeModal.jsx'; 
 
 const WatchList = () => {
-  const [search, setSearch] = useState('')
-  const [activeTab, setActiveTab] = useState('List 1')
+  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('List 1');
 
-  // Converted to state so we can actually delete items
+  // Trade Modal State
+  const [tradeModalConfig, setTradeModalConfig] = useState({
+    isOpen: false,
+    instrument: '',
+    action: 'BUY', // Default
+    ltp: 0
+  });
+
+  // Helper function to open the Trade Modal
+  const openTradeModal = (instrument, action, ltpString) => {
+    // Convert string price like "2,932.40" to a clean number: 2932.40
+    const ltpNumber = parseFloat(ltpString.replace(/,/g, ''));
+    setTradeModalConfig({ isOpen: true, instrument, action, ltp: ltpNumber });
+  };
+
+  // Stock List State
   const [stocks, setStocks] = useState([
     { symbol: 'RELIANCE', price: '2,932.40', change: '34.50', percent: '+1.20%', isUp: true },
     { symbol: 'HDFCBANK', price: '1,440.15', change: '11.20', percent: '-0.80%', isUp: false },
@@ -15,12 +31,17 @@ const WatchList = () => {
     { symbol: 'SBIN', price: '750.25', change: '13.50', percent: '+1.80%', isUp: true },
     { symbol: 'ITC', price: '425.60', change: '1.25', percent: '-0.30%', isUp: false },
     { symbol: 'L&T', price: '3,450.90', change: '45.00', percent: '+1.32%', isUp: true },
-  ])
+  ]);
 
   // Functional delete handler
   const removeStock = (symbolToRemove) => {
-    setStocks(stocks.filter(stock => stock.symbol !== symbolToRemove))
-  }
+    setStocks(stocks.filter(stock => stock.symbol !== symbolToRemove));
+  };
+
+  // Filter stocks based on search input
+  const filteredStocks = stocks.filter(stock => 
+    stock.symbol.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     // Reduced left margin to lg:ml-4 to sit closer to the edge, keeping the floating card look
@@ -64,7 +85,7 @@ const WatchList = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
           <span className='text-[10px] bg-slate-100 px-2 py-1 rounded border border-slate-200 text-slate-400 font-bold ml-2 shrink-0'>
-            {stocks.length}/50
+            {filteredStocks.length}/50
           </span>
         </div>
       </div>
@@ -77,12 +98,12 @@ const WatchList = () => {
 
       {/* Stock List Body */}
       <div className='flex-1 overflow-y-auto custom-scrollbar'>
-        {stocks.length === 0 ? (
+        {filteredStocks.length === 0 ? (
           <div className='p-8 text-center text-slate-400 font-medium text-sm'>
-            Your watchlist is empty. Search to add instruments.
+            No instruments found.
           </div>
         ) : (
-          stocks.map((stock, idx) => (
+          filteredStocks.map((stock, idx) => (
             <div key={idx} className='group flex items-center justify-between px-6 py-4 border-b border-slate-50 hover:bg-slate-50/80 cursor-pointer transition-colors relative'>
               
               {/* Symbol */}
@@ -98,13 +119,35 @@ const WatchList = () => {
               {/* Price & Change */}
               <div className='text-right flex items-center gap-4'>
                 
-                {/* Actions (Buy, Sell, Delete) - Adjusted to fit the trash icon cleanly */}
-                <div className='hidden group-hover:flex items-center gap-1.5 mr-2 animate-in fade-in slide-in-from-right-2 duration-200 absolute right-28 bg-white/95 backdrop-blur-md p-1.5 rounded-xl shadow-sm border border-slate-100'>
-                  <button className='px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 shadow-sm transition-colors'>B</button>
-                  <button className='px-4 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-lg hover:bg-rose-700 shadow-sm transition-colors'>S</button>
+                {/* Actions (Buy, Sell, Delete) */}
+                <div className='hidden group-hover:flex items-center gap-1.5 mr-2 animate-in fade-in slide-in-from-right-2 duration-200 absolute right-28 bg-white/95 backdrop-blur-md p-1.5 rounded-xl shadow-sm border border-slate-100 z-10'>
+                  
+                  {/* BUY BUTTON */}
                   <button 
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevents triggering the row click
+                      e.stopPropagation(); // Prevents row click
+                      openTradeModal(stock.symbol, 'BUY', stock.price);
+                    }}
+                    className='px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 shadow-sm transition-colors active:scale-95'
+                  >
+                    B
+                  </button>
+
+                  {/* SELL BUTTON */}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevents row click
+                      openTradeModal(stock.symbol, 'SELL', stock.price);
+                    }}
+                    className='px-4 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-lg hover:bg-rose-700 shadow-sm transition-colors active:scale-95'
+                  >
+                    S
+                  </button>
+
+                  {/* DELETE BUTTON */}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation(); 
                       removeStock(stock.symbol);
                     }} 
                     className='p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors ml-1'
@@ -114,7 +157,8 @@ const WatchList = () => {
                   </button>
                 </div>
 
-                <div className='flex flex-col items-end group-hover:opacity-20 transition-opacity duration-200'>
+                {/* LTP Pricing Display */}
+                <div className='flex flex-col items-end group-hover:opacity-10 transition-opacity duration-200'>
                   <p className={`text-[15px] font-black ${stock.isUp ? 'text-emerald-600' : 'text-rose-600'}`}>
                     {stock.price}
                   </p>
@@ -131,8 +175,18 @@ const WatchList = () => {
           ))
         )}
       </div>
+
+      {/* The Trade Execution Modal */}
+      <TradeModal 
+        isOpen={tradeModalConfig.isOpen}
+        onClose={() => setTradeModalConfig({ ...tradeModalConfig, isOpen: false })}
+        instrument={tradeModalConfig.instrument}
+        initialAction={tradeModalConfig.action}
+        ltp={tradeModalConfig.ltp}
+      />
+      
     </div>
-  )
+  );
 }
 
-export default WatchList
+export default WatchList;

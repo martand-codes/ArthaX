@@ -163,3 +163,178 @@ export const ordersData = [
     message: 'Insufficient margin'
   }
 ];
+
+
+
+
+export const fundsSummary = {
+  totalBalance: 145620.50,
+  availableMargin: 98000.00,
+  usedMargin: 47620.50,
+  unclearedFunds: 12500.00, // NEW: Money waiting to settle
+  linkedBank: "HDFC Bank",  // NEW
+  bankEnding: "4098",       // NEW
+};
+
+export const transactionsData = [
+  {
+    id: 'TXN-998273',
+    date: '21 Jun 2026',
+    time: '10:30 AM',
+    type: 'DEPOSIT',
+    method: 'UPI',
+    amount: 5620.50,
+    status: 'SUCCESS',
+  },
+  {
+    id: 'TXN-998102',
+    date: '18 Jun 2026',
+    time: '03:15 PM',
+    type: 'WITHDRAWAL',
+    method: 'Bank Transfer',
+    amount: 12000.00,
+    status: 'SUCCESS',
+  },
+  {
+    id: 'TXN-997544',
+    date: '15 Jun 2026',
+    time: '09:00 AM',
+    type: 'CHARGE',
+    method: 'Brokerage',
+    amount: 45.50,
+    status: 'SUCCESS',
+  },
+  {
+    id: 'TXN-997100',
+    date: '10 Jun 2026',
+    time: '08:45 AM',
+    type: 'DEPOSIT',
+    method: 'Net Banking',
+    amount: 50000.00,
+    status: 'FAILED',
+  }
+];
+
+
+// --- REPORTS DATA ---
+export const reportSummary = {
+  grossPnL: 68500.50,
+  chargesAndTaxes: 8120.25, // Brokerage, STT, Exchange Fees
+  netPnL: 60380.25,
+  winRate: 68.5,
+  totalTrades: 142
+};
+
+export const reportData = [
+  {
+    id: 'TRD-1092',
+    date: '20 Jun 2026',
+    instrument: 'RELIANCE',
+    qty: 250,
+    buyValue: 712500.00, // 250 * 2850
+    sellValue: 733100.00, // 250 * 2932.4
+    pnl: 20600.00,
+    isProfit: true
+  },
+  {
+    id: 'TRD-1091',
+    date: '18 Jun 2026',
+    instrument: 'HDFCBANK',
+    qty: 100,
+    buyValue: 148000.00, 
+    sellValue: 144015.00, 
+    pnl: -3985.00,
+    isProfit: false
+  },
+  {
+    id: 'TRD-1088',
+    date: '15 Jun 2026',
+    instrument: 'TCS',
+    qty: 50,
+    buyValue: 200000.00, 
+    sellValue: 205250.00, 
+    pnl: 5250.00,
+    isProfit: true
+  },
+  {
+    id: 'TRD-1085',
+    date: '12 Jun 2026',
+    instrument: 'INFY',
+    qty: 150,
+    buyValue: 247500.00, 
+    sellValue: 243120.00, 
+    pnl: -4380.00,
+    isProfit: false
+  },
+  {
+    id: 'TRD-1080',
+    date: '05 Jun 2026',
+    instrument: 'ICICIBANK',
+    qty: 300,
+    buyValue: 315000.00, 
+    sellValue: 325590.00, 
+    pnl: 10590.00,
+    isProfit: true
+  }
+];
+
+
+// --- DASHBOARD CHART DATA ---
+
+// 1. Data for the massive Equity Curve (Line Chart) WITH Benchmark
+export const portfolioHistory = [
+  { date: '1 Jan', value: 100000, benchmark: 100000 },
+  { date: '1 Feb', value: 105000, benchmark: 102000 },
+  { date: '1 Mar', value: 102000, benchmark: 99000 },
+  { date: '1 Apr', value: 115000, benchmark: 104000 },
+  { date: '1 May', value: 125000, benchmark: 108000 },
+  { date: '1 Jun', value: 121000, benchmark: 106000 },
+  { date: 'Current', value: 145620, benchmark: 110000 }, 
+];
+
+// 2. Data for the Asset Allocation (Donut Chart)
+export const assetAllocation = [
+  { name: 'Equity (Stocks)', value: 85000, color: '#10B981' }, 
+  { name: 'Mutual Funds', value: 45000, color: '#3B82F6' }, 
+  { name: 'Available Cash', value: 15620, color: '#8B5CF6' }, 
+];
+
+// 3. For the Monthly Performance Bar Chart
+export const monthlyPnL = [
+  { month: 'Jan', pnl: 12500, isProfit: true },
+  { month: 'Feb', pnl: 8400, isProfit: true },
+  { month: 'Mar', pnl: -3200, isProfit: false },
+  { month: 'Apr', pnl: 15600, isProfit: true },
+  { month: 'May', pnl: -1100, isProfit: false },
+  { month: 'Jun', pnl: 24620, isProfit: true },
+];
+
+// 4. For the Sector Exposure Radar Chart
+export const sectorExposure = [
+  { sector: 'Technology', value: 85 },
+  { sector: 'Banking', value: 65 },
+  { sector: 'Energy', value: 40 },
+  { sector: 'FMCG', value: 30 },
+  { sector: 'Auto', value: 50 },
+  { sector: 'Pharma', value: 20 },
+];
+
+// --- DEEP ANALYTICS DATA FOR DASHBOARD ---
+
+// 1. Market Cap / Asset Type Distribution
+export const capAllocation = [
+  { name: 'Large Cap', value: 55000, color: '#2563EB' }, // Blue
+  { name: 'Mid Cap', value: 20000, color: '#8B5CF6' }, // Purple
+  { name: 'Small Cap', value: 10000, color: '#F59E0B' }, // Amber
+];
+
+// 2. Win/Loss P&L Breakdown by Instrument (Where are we making/losing money?)
+export const pnlByInstrument = [
+  { name: 'RELIANCE', pnl: 15400 },
+  { name: 'TCS', pnl: 8200 },
+  { name: 'ZOMATO', pnl: 5100 },
+  { name: 'INFY', pnl: -2100 },
+  { name: 'HDFCBANK', pnl: -4500 },
+  { name: 'PAYTM', pnl: -8000 },
+];
+
