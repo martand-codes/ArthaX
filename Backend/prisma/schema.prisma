@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  portfolio Portfolio?
+  id           String        @id @default(uuid())
+  email        String        @unique
+  fullName     String
+  password     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  wallet       Wallet?
+  bankAccounts BankAccount[] 
+}
+
+model BankAccount {
+  id            String        @id @default(uuid())
+  accountNumber String
+  ifscCode      String   
+  bankName      String
+  
+  // SOFT DELETE: Never actually delete financial sources
+  isActive      Boolean       @default(true) 
+  
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  
+  // Link to track which account was used for a deposit/withdrawal
+  transactions  Transaction[] 
+  
+  createdAt     DateTime      @default(now())
+}
+
+model Wallet {
+  id            String        @id @default(uuid()) 
+  balance       Decimal       @default(0.00) @db.Decimal(15, 2) 
+  currency      String        @default("INR")
+  
+  userId        String        @unique
+  user          User          @relation(fields: [userId], references: [id])
+
+  sentMoney     Transaction[] @relation("SenderWallet")
+  receivedMoney Transaction[] @relation("ReceiverWallet")
+}
+
+enum TxStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum TxType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+}
+
+model Transaction {
+  id                  String       @id @default(uuid()) 
+  amount              Decimal      @db.Decimal(15, 2)   
+  status              TxStatus     @default(PENDING) 
+  type                TxType       @default(TRANSFER)
+  description         String?  
+  
+  // AUDIT TRAIL: Snapshots of the balance after the movement
+  senderBalanceAfter  Decimal?     @db.Decimal(15, 2)
+  receiverBalanceAfter Decimal?    @db.Decimal(15, 2)
+  
+  createdAt           DateTime     @default(now())
+
+  senderId            String?      
+  sender              Wallet?      @relation("SenderWallet", fields: [senderId], references: [id])
+
+  receiverId          String?
+  receiver            Wallet?      @relation("ReceiverWallet", fields: [receiverId], references: [id])
+  
+  // LINK: The external bank account used for Deposits/Withdrawals
+  bankAccountId       String?
+  bankAccount         BankAccount? @relation(fields: [bankAccountId], references: [id])
+}
+// 1. The Asset (What is being traded)
+model Stock {
+  id            String    @id @default(uuid())
+  symbol        String    @unique // e.g., "RELIANCE", "TCS"
+  companyName   String
+  currentPrice  Decimal   @db.Decimal(15, 2) // Updated via background jobs later
+  isActive      Boolean   @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  orders        Order[]
+  holdings      Holding[]
+}
+
+// 2. The Container (Links the User to their investments)
+model Portfolio {
+  id        String    @id @default(uuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  
+  holdings  Holding[]
+  orders    Order[]
+}
+
+// 3. The Ownership Record (What the user actually holds right now)
+model Holding {
+  id              String    @id @default(uuid())
+  portfolioId     String
+  portfolio       Portfolio @relation(fields: [portfolioId], references: [id])
+  
+  stockId         String
+  stock           Stock     @relation(fields: [stockId], references: [id])
+  
+  quantity        Int       @default(0) // Whole shares
+  averageBuyPrice Decimal   @db.Decimal(15, 2)
+  
+  // A portfolio can only have ONE holding record per specific stock
+  @@unique([portfolioId, stockId]) 
+}
+
+enum OrderType {
+  BUY
+  SELL
+}
+enum OrderExecutionType {
+  MARKET
+  LIMIT
+}
+enum OrderStatus {
+  PENDING
+  FILLED
+  PARTIALLY_FILLED
+  CANCELLED
+}
+// 4. The Intent (The user asking to buy/sell)
+model Order {
+  id            String             @id @default(uuid())
+  portfolioId   String
+  portfolio     Portfolio          @relation(fields: [portfolioId], references: [id])
+  
+  stockId       String
+  stock         Stock              @relation(fields: [stockId], references: [id])
+  
+  type          OrderType
+  executionType OrderExecutionType @default(MARKET) 
+  status        OrderStatus        @default(PENDING)
+  quantity      Int
+   
+  // MARKET orders will leave this as null.
+  limitPrice    Decimal?           @db.Decimal(15, 2) 
+  
+  trades        Trade[]     
+  
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+}
+
+// 5. The Execution (The actual fulfillment of the order)
+model Trade {
+  id               String   @id @default(uuid())
+  orderId          String
+  order            Order    @relation(fields: [orderId], references: [id])
+  
+  executedPrice    Decimal  @db.Decimal(15, 2)
+  executedQuantity Int
+  
+  createdAt        DateTime @default(now())
+}
