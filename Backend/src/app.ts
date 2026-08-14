@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
-import cors from 'cors'
-
+import cors from 'cors';
+import authRoute from "./routes/authRoute";
+import walletRoutes from './routes/walletRoute';
 
 const app = express();
 app.use(cors());
@@ -12,5 +13,7 @@ app.get("/api/health", (req: Request, res: Response) => {
         message:"Server is Healthy"
     });
 });
+app.use('/api/auth', authRoute);
+app.use('/api/wallet', walletRoutes);
 
 export default app;
