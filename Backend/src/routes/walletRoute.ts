@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { depositFunds, getTransactionHistory, getWalletBalance } from '../controllers/walletController';
+import { depositFunds, getTransactionHistory, getWalletBalance, withdrawFunds } from '../controllers/walletController';
 import { protectRoute } from '../middlewares/authMiddleware';
 import { validate } from '../validators/validateRequest';
-import { amountSchema } from '../validators/walletValidator'; 
+import { depositSchema, withdrawSchema } from '../validators/walletValidator'; 
 
 const router = Router();
 
@@ -10,7 +10,10 @@ const router = Router();
 router.get('/balance', protectRoute, getWalletBalance);
 
 // For Depositing Funds
-router.post('/deposit', protectRoute, validate(amountSchema), depositFunds);
+router.post('/deposit', protectRoute, validate(depositSchema), depositFunds);
+
+// For Withdrawl
+router.post('/withdraw', protectRoute, validate(withdrawSchema), withdrawFunds);
 
 // For Fetching the Reciept
 router.get('/transactions', protectRoute, getTransactionHistory);
