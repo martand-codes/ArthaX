@@ -78,7 +78,7 @@ export const getTransactionHistory = async (req: AuthRequest, res: Response): Pr
     const userId = req.user?.userId;
 
     if (!userId) {
-      res.status(401).json({ success: false, error: 'Unauthorized' });
+      res.status(401).json({ success: false, error: 'Unauthorized User! Restricting Access' });
       return;
     }
     const transactions = await WalletService.getTransactionHistory(userId);
@@ -90,10 +90,47 @@ export const getTransactionHistory = async (req: AuthRequest, res: Response): Pr
     });
   } catch (error: any) {
     if (error.message === 'No_Wallet') {
-      res.status(404).json({ success: false, error: 'Wallet not found' });
+      res.status(404).json({ success: false, error: 'Wallet Not Found in Our Records' });
       return;
     }
     console.error('Transaction Fetch Error:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+};
+
+
+export const withdrawFunds = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { amount } = req.body;
+
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized User! Restricting Access' });
+      return;
+    }
+
+    const updatedWallet = await WalletService.withdraw(userId, amount);
+
+    res.status(200).json({
+      success: true,
+      message: 'Funds withdrawn successfully',
+      wallet: {
+        id: updatedWallet.id,
+        balance: updatedWallet.balance,
+        currency: updatedWallet.currency,
+      }
+    });
+  } catch (error: any) {
+    if (error.message === 'No_Wallet') {
+      res.status(404).json({ success: false, error: 'Wallet Not Found in Our Records' });
+      return;
+    }
+    // Our new safety net catching the over-withdrawal attempt
+    if (error.message === 'INSUFFICIENT_FUNDS') {
+      res.status(400).json({ success: false, error: 'Insufficient funds for this withdrawal' });
+      return;
+    }
+    console.error('Withdrawal Error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };

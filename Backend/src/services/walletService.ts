@@ -70,5 +70,51 @@ export class WalletService {
 
     return transactions;
   }
+
+  // For WithDrawl
+  static async withdraw(userId: string, amount: number) {
+    const wallet = await prisma.wallet.findUnique({
+      where: { userId }
+    });
+
+    if (!wallet) {
+      throw new Error('No_Wallet');
+    }
+
+    const currentBalance = parseFloat(wallet.balance.toString());
+
+    // If Demand is higher than supply
+    if (currentBalance < amount) {
+      throw new Error('INSUFFICIENT_FUNDS');
+    }
+
+    const newBalance = currentBalance - amount;
+
+    // THE ATOMIC TRANSACTION
+    const result = await prisma.$transaction(async (tx) => {
+      
+      // Deduct from the wallet
+      const updatedWallet = await tx.wallet.update({
+        where: { id: wallet.id },
+        data: { balance: newBalance }
+      });
+
+      // Audit Trail receipt
+      const transactionRecord = await tx.transaction.create({
+        data: {
+          type: 'WITHDRAWAL',
+          status: 'COMPLETED',
+          amount: amount,
+          senderId: wallet.id,                    // Money is leaving this wallet
+          senderBalanceAfter: newBalance,         // Snapshot of the reduced balance
+          description: 'User initiated withdrawal'
+        }
+      });
+
+      return { updatedWallet, transactionRecord };
+    });
+
+    return result.updatedWallet;
+  }
 }
 
